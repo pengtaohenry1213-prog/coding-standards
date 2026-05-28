@@ -11,7 +11,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/pengtaohenry1213/coding-standards.git"
+    "url": "https://github.com/pengtaohenry1213-prog/coding-standards.git"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
