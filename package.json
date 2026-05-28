@@ -1,6 +1,6 @@
 {
   "name": "@pengtaohenry1213-prog/coding-standards",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "团队统一编码规范与AI辅助配置",
   "main": "src/index.js",
   "scripts": {
