@@ -1,0 +1,27 @@
+# .githooks 目录受保护，请勿修改 pre-commit 脚本
+
+## 管理 Token
+
+Token 文件: `.admin_token`（不在 git 中追踪）
+
+更新密码:
+```bash
+# 生成随机密码
+.githooks/update_token.sh
+
+# 使用指定密码
+.githooks/update_token.sh YourNewPassword
+```
+
+## 提交 .cursor 目录
+
+```bash
+# 方式1: 环境变量（本地/CI/CD）
+GIT_ADMIN_TOKEN=Xgd3XGK0UAvxHjnLVAiuyaxT git commit -m "commit message"
+
+# 方式2: 直接运行脚本（自动读取 .admin_token）
+.githooks/pre-commit
+
+# 方式3: git hooks 配置正确时直接提交
+git commit -m "commit message"
+```

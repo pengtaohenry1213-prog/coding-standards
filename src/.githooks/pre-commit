@@ -1,0 +1,54 @@
+#!/bin/sh
+
+PROTECTED_DIRS=".cursor"
+SKIP_DIRS=".githooks"
+
+# 管理员token验证
+# 支持两种方式（优先使用环境变量）:
+#   1. 环境变量 GIT_ADMIN_TOKEN（CI/CD 使用）
+#   2. 本地文件 .admin_token（本地开发使用）
+ADMIN_TOKEN=""
+ADMIN_TOKEN_HASH=""
+ADMIN_TOKEN_FILE="${GIT_HOOKS_DIR:-.githooks}/.admin_token"
+
+# 优先使用环境变量
+if [ -n "$GIT_ADMIN_TOKEN" ]; then
+    ADMIN_TOKEN="$GIT_ADMIN_TOKEN"
+elif [ -f "$ADMIN_TOKEN_FILE" ]; then
+    ADMIN_TOKEN=$(cat "$ADMIN_TOKEN_FILE" 2>/dev/null | tr -d '[:space:]')
+fi
+
+# 计算哈希
+if [ -n "$ADMIN_TOKEN" ]; then
+    ADMIN_TOKEN_HASH=$(printf '%s' "$ADMIN_TOKEN" | shasum -a 256 2>/dev/null | cut -d' ' -f1)
+fi
+
+# 验证哈希
+EXPECTED_HASH="12e593472f3f43d5645e49a265fdb592a7e2e1da64d80ea4f0bdea077cc103af"
+if [ "$ADMIN_TOKEN_HASH" = "$EXPECTED_HASH" ]; then
+    echo "🔑 管理模式: 跳过 .cursor 保护检查"
+    exit 0
+fi
+
+# 标准检查...
+ALL_FILES=$(git diff --cached --name-only; git diff --name-only; git ls-files --others --exclude-standard)
+BLOCKED_FILES=""
+
+for file in $ALL_FILES; do
+    for skip in $SKIP_DIRS; do
+        case "$file" in $skip|$skip/*) continue 2 ;; esac
+    done
+    for dir in $PROTECTED_DIRS; do
+        case "$file" in $dir|$dir/*) BLOCKED_FILES="${BLOCKED_FILES}  - ${file}
+" ;; esac
+    done
+done
+
+if [ -n "$BLOCKED_FILES" ]; then
+    echo "❌ 提交被拒绝: 以下文件匹配受保护规则"
+    echo ""
+    echo "$BLOCKED_FILES"
+    exit 1
+fi
+
+echo "✅ protected 规则检查通过"
