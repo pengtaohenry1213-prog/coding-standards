@@ -1,0 +1,62 @@
+# Git Commit 规范（统一）
+
+## 规范约定（引用）
+
+**详细规范文档**：`docs/AI工程化开发手册/Git 规范（AI 工程化开发版）.md`
+
+## 格式
+
+```
+{type}(stepN): {todo-id} {描述}
+```
+
+## 类型定义
+
+| 类型 | 使用场景 |
+|------|----------|
+| plan | 生成 Plan 文件 |
+| feat | 前端/后端功能开发 |
+| fix | bug 修复 |
+| test | 测试验证 |
+| refactor | 重构优化 |
+| docs | 文档更新 |
+
+## 示例
+
+```bash
+# Plan 生成
+git commit -m "plan(step1): 生成登录模块 Plan"
+
+# 前端功能
+git commit -m "feat(step1): todo-1 登录页面UI"
+
+# 后端功能
+git commit -m "feat(step1): todo-2 登录接口"
+
+# Bug 修复
+git commit -m "fix(step1): todo-3 修复接口超时"
+
+# 测试验证
+git commit -m "test(step1): todo-4 登录功能测试"
+
+# 全部完成
+git commit -m "feat(step1): 全部完成 + 验收通过"
+```
+
+## 强制规则
+
+1. **每个 todo 完成后必须独立 commit**
+2. **commit 信息必须包含 stepN 和 todo-id**
+3. **无变更时跳过 commit，记录日志 "无变更"**
+4. **使用语义化提交类型**
+
+## 防止空提交
+
+```bash
+# 检查是否有未提交变更
+if git diff --stat | grep -q "0 files changed"; then
+  echo "无变更，跳过 commit"
+else
+  git add . && git commit -m "feat(stepN): 完成 todo-x"
+fi
+```

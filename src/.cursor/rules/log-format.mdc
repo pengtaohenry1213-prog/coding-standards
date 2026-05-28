@@ -1,0 +1,54 @@
+# 日志格式规范（统一）
+
+所有 Agent 必须使用以下统一日志格式。
+
+## 统一格式
+
+```markdown
+### HH:MM - [agent: {type}]
+
+**操作**: 描述
+**文件**: 文件路径
+**结果**: 完成 / 失败
+```
+
+## 示例
+
+```markdown
+### 14:32 - [agent: planner]
+
+**操作**: 生成 Plan
+**文件**: .cursor/plans/step1-plan.md
+**结果**: 完成
+
+### 14:35 - [agent: frontend]
+
+**操作**: 实现上传组件 UI
+**文件**: packages/frontend/components/Upload.tsx
+**结果**: 完成
+
+### 14:40 - [agent: backend]
+
+**操作**: 实现上传接口
+**文件**: packages/backend/routes/upload.ts
+**结果**: 完成
+
+### 14:45 - [agent: test]
+
+**操作**: 执行测试用例
+**文件**: 测试报告
+**结果**: 完成
+```
+
+## Agent 类型对照
+
+| agent type | 对应角色 |
+|------------|----------|
+| planner | Planner Agent |
+| frontend | Frontend Agent |
+| backend | Backend Agent |
+| test | Test Agent |
+| reviewer | Reviewer Agent |
+| fix | Fix Agent |
+| security | Security Human Gate |
+| pmo | PMO Human Gate |

@@ -1,0 +1,236 @@
+---
+description: 后端开发相关的任务，包括 Node.js/NestJS + TypeScript 服务开发、API 设计、数据库操作、中间件编写、安全配置。
+alwaysApply: false
+---
+
+# 后端工程化规范（NestJS + TypeScript）
+
+## 规范引用
+
+详细规范见：`docs/AI工程化开发手册/后端工程化 SOP（Node.js + NestJS）.md`
+
+## 目录结构
+
+```
+src/
+├── common/              # 公共模块
+│   ├── decorators/     # 装饰器
+│   ├── filters/         # 异常过滤器
+│   ├── guards/          # 守卫
+│   └── utils/           # 工具函数
+├── config/              # 配置文件
+├── modules/             # 业务模块
+│   ├── user/
+│   │   ├── dto/         # 数据传输对象
+│   │   ├── entities/    # 实体
+│   │   ├── user.controller.ts
+│   │   ├── user.service.ts
+│   │   └── user.module.ts
+├── database/            # 数据库相关
+│   ├── migrations/      # 迁移文件
+│   └── seeds/           # 种子数据
+└── main.ts
+```
+
+## 分层规范（强制）
+
+| 层级 | 职责 | 禁止 |
+|------|------|------|
+| Controller | 接收请求、参数校验、返回响应 | 禁止写业务逻辑 |
+| Service | 业务逻辑、数据处理 | 禁止直接操作 req/res |
+| Repository/Entity | 数据库操作 | 禁止写业务逻辑 |
+
+## TypeScript 强制规范
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  }
+}
+```
+
+### 类型规范
+
+```ts
+// ❌ 禁止
+const data: any = {};
+
+// ✅ 必须
+interface User {
+  id: string;
+  name: string;
+}
+const data: User = { id: '1', name: 'test' };
+```
+
+## API 规范
+
+### RESTful 命名
+
+| 操作 | 方法 | URL |
+|------|------|-----|
+| 获取列表 | GET | /users |
+| 获取单个 | GET | /users/:id |
+| 创建 | POST | /users |
+| 更新 | PUT | /users/:id |
+| 删除 | DELETE | /users/:id |
+
+### 统一响应结构
+
+```ts
+// 成功
+{ "code": 0, "message": "success", "data": {...} }
+
+// 错误
+{ "code": 1001, "message": "用户不存在", "data": null }
+```
+
+## DTO 规范
+
+```ts
+// ✅ 必须有 class-validator 校验
+export class CreateUserDto {
+  @IsString()
+  @MinLength(2)
+  @MaxLength(50)
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  @MinLength(6)
+  password: string;
+}
+```
+
+## Entity 规范
+
+```ts
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ length: 255 })
+  email: string;
+
+  @Column({ name: 'password_hash' })
+  passwordHash: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+```
+
+## 异常处理规范
+
+```ts
+// ❌ 禁止
+throw new Error('用户不存在');
+
+// ✅ 必须
+throw new NotFoundException('用户不存在');
+```
+
+## 日志规范
+
+```ts
+// ✅ 正确
+this.logger.log({
+  action: 'USER_LOGIN',
+  userId: user.id,
+  ip: request.ip,
+  timestamp: new Date(),
+});
+
+// ❌ 禁止
+console.log(user);
+console.error(err);
+```
+
+## 安全红线（强制）
+
+- ❌ 禁止密码明文存储（必须 bcrypt）
+- ❌ 禁止 JWT secret 硬编码
+- ❌ 禁止敏感信息进 Git
+- ❌ 禁止 SQL 字符串拼接
+- ❌ 禁止信任前端参数
+- ❌ 禁止文件上传无校验
+- ❌ 禁止直接返回 Entity 给前端（必须用 DTO）
+
+## 测试要求
+
+AI 生成代码必须同时输出：
+
+1. 正常测试用例
+2. 边界测试用例
+3. 异常测试用例
+4. 空值测试用例
+
+## AI 开发 Prompt 模板
+
+```txt
+【任务】
+创建 [模块名] 模块
+
+【技术栈】
+NestJS + TypeORM + PostgreSQL
+
+【要求】
+- 严格 TypeScript 类型
+- DTO 必须有 class-validator 校验
+- Service 处理业务逻辑
+- Controller 只做路由分发
+- 禁止 any
+- 禁止 console.log
+
+【输出】
+1. 目录结构
+2. Entity 设计
+3. DTO 设计
+4. API 设计
+5. 代码实现
+```
+
+---
+
+## 常见坏味道（触发即改）
+
+| 症状 | 处理 |
+|------|------|
+| Controller 堆业务逻辑 | 下沉 Service |
+| 循环内逐条查库 | 批量查询 |
+| console.log 当异常处理 | 统一日志 + 错误码 |
+| 配置写死源码 | 配置与环境分离 |
+| 直接返回 Entity | 必须用 DTO 转换 |
+
+---
+
+## CI 门禁
+
+PR 必须通过：
+
+```yaml
+- eslint
+- typecheck
+- test
+- build
+```
+
+合并标准：
+
+```text
+✔ lint 通过
+✔ 类型通过
+✔ 单元测试 > 70%
+✔ review 通过
+```

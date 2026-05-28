@@ -1,0 +1,77 @@
+---
+name: Frontend Performance Code Review
+description: A comprehensive skill to audit frontend project code/config against 10 core performance optimization dimensions, outputting compliance status, issue lists, actionable optimizations, and priority ranking.
+author: Frontend Performance Expert
+version: 1.0.0
+tags: ["frontend", "performance", "code review", "optimization", "LCP", "FPS"]
+triggerKeywords: ["frontend performance review", "performance code audit", "load performance optimization", "runtime FPS optimization", "LCP optimization review"]
+alwaysApply: false
+---
+
+# Core Execution Logic
+
+## Step 1: Dimension-Based Compliance Check
+
+Validate code/config against 10 performance dimensions and mark compliance status with evidence:
+
+| Dimension | Validation Criteria |
+| --- | --- |
+| 1. Performance Metric Monitoring | - Integrated FP/FCP/LCP monitoring via Paint Timing API<br>- Used Lighthouse/Chrome DevTools for baseline testing<br>- Configured Network "Disable Cache" + Coverage analysis |
+| 2. Network Layer Optimization | - Enabled HTTP2/HTTP3 (vs HTTP1.1 head-of-line blocking)<br>- Configured CDN for static assets + DNS Prefetch/Preconnect<br>- Added Preload/modulepreload for critical resources<br>- Enabled gzip/brotli compression (server + build)<br>- Cached CORS preflight with `Access-Control-Max-Age` |
+| 3. Resource Loading Optimization | - Implemented Code Splitting (route lazy loading)<br>- Enabled Tree Shaking<br>- Configured `Cache-Control: max-age=31536000`<br>- Build artifacts with hash filenames (e.g., app.89fd213.js)<br>- Image optimization (WebP, lazy loading, compression)<br>- On-demand 3rd-party imports (e.g., lodash single methods) |
+| 4. Build Phase Optimization | - Enabled JS/CSS/HTML minification (Terser/Cssnano)<br>- Split Chunks (vendor/business/runtime)<br>- No devDependencies in production dependencies<br>- Used bundle analyzers (rollup-plugin-visualizer) |
+| 5. CSS Loading Optimization | - Critical CSS inlined in `<style>`<br>- Non-critical CSS loaded async via `media="print"`<br>- Removed unused CSS (Coverage analysis)<br>- All CSS bundled in `<head>` |
+| 6. JS Execution Optimization | - `<script>` with `async/defer` (no HTML parse blocking)<br>- Non-critical JS at body end<br>- Split long tasks (>10ms) + `requestIdleCallback`<br>- Web Worker for heavy computation<br>- Event delegation for fewer listeners |
+| 7. Browser Rendering Optimization | - Batch DOM ops with DocumentFragment<br>- Animations use `transform/opacity` (composite layer only)<br>- Avoid frequent style changes (use class instead)<br>- `requestAnimationFrame` for smooth animations |
+| 8. FPS Optimization | - JS execution < 10ms per frame (60FPS target)<br>- Removed long tasks causing jank<br>- Monitored/reduced layout/paint frequency |
+| 9. User Experience Optimization | - Implemented skeleton screens<br>- Enabled lazy loading (images/components)<br>- Configured SSR/streaming rendering (if applicable) |
+| 10. Cache Strategy | - HTTP cache + build hash double-layer strategy<br>- Valid cache invalidation (hash changes on content update) |
+
+## Step 2: Extract Issue List
+
+List non-compliant items with:
+
+- Exact location (file/line: e.g., `index.html:5 <script> missing defer`)
+- Impact dimension (e.g., "JS Execution Optimization")
+- Impact level (Core/Secondary/Experience)
+
+## Step 3: Actionable Optimization Suggestions
+
+For each issue, provide:
+
+- Step-by-step implementation
+- Full code/config examples
+- Expected performance gain (e.g., "LCP reduced by 30%")
+
+## Step 4: Priority Ranking
+
+Sort issues by impact:
+
+1. **Core (Must Fix)**: Block first paint/LCP, cause jank (FPS drop)
+2. **Secondary (Recommended Fix)**: Increase bundle size, inefficient caching
+3. **Experience (Optional)**: Skeleton screens, minor UX tweaks
+
+## Output Format
+
+```markdown
+### 1. Compliance Check Results
+| Dimension | Status | Evidence |
+|-----------|--------|----------|
+| [Dimension Name] | [Compliant/Non-Compliant/Partially Compliant] | [Specific code/config validation result] |
+
+### 2. Issue List
+1. [Issue Description] - [Impact Dimension] - [Impact Level]
+2. ...
+
+### 3. Optimization Suggestions
+#### Issue: [Issue Description]
+- Solution: [Step-by-step + code example]
+- Expected Outcome: [Performance improvement target]
+
+### 4. Priority Ranking
+#### Core Impact (Must Fix)
+- [Issue] - [Rationale (e.g., "Blocks LCP, 50% user drop-off")]
+#### Secondary Impact (Recommended Fix)
+- [Issue] - [Rationale]
+#### Experience Optimization (Optional)
+- [Issue] - [Rationale]

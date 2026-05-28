@@ -1,0 +1,90 @@
+# PDF 解析服务规范
+
+## 定位
+
+PDF 文档全内容解析服务，合并「原生文本 + 图片 OCR 识别」，支撑知识库完整文本提取。
+
+## 核心能力
+
+- 基于 `pdfjs-dist` 提取 PDF 原生可复制文本
+- 基于 `tesseract.js` 识别 PDF 内嵌图片/扫描件文字
+- 原生文本 + OCR 文本合并输出，返回完整文本
+
+## 技术栈约束
+
+| 库 | 约束 |
+|---|------|
+| `pdfjs-dist` | 已全局集成，禁止修改/重复配置 Worker |
+| `tesseract.js` | 纯 JS 实现，无系统依赖 |
+| `pdf-image` | PDF 转图片，用于 OCR 提取 |
+| `fs-extra` | 临时文件目录管理 |
+
+**禁止项**：
+- 禁止使用 `pdf-parse`，必须复用 `pdfjs-dist`
+- 禁止修改已集成的 `pdfjs-dist` 全局配置
+- 禁止引入浏览器 / Vite 专属 API
+- 禁止在 Vite 打包目录创建临时文件
+
+## 文件结构
+
+```
+packages/backend/
+├── src/services/
+│   └── file.service.ts    # 核心：PDF 解析 + OCR 逻辑
+├── uploads/pdfs/          # PDF 存储目录
+└── temp-pdf-images/       # 临时图片目录（自动创建和清理）
+```
+
+## 依赖安装
+
+```bash
+pnpm add pdf-image tesseract.js fs-extra -F backend
+```
+
+## Service 层实现要求
+
+### parseFile 函数逻辑
+
+1. **PDF 解析**：
+   - 使用 `pdfjs-dist` 遍历所有页面提取原生文本
+   - 标记为 `【原生文本】`
+
+2. **图片 OCR**：
+   - 使用 `pdf-image` 将 PDF 页面转为图片
+   - 使用 `tesseract.js` 识别图片文字
+   - 标记为 `【图片OCR文本】`
+
+3. **临时文件清理**：
+   - 每张图片 OCR 后立即删除
+   - 最后删除整个临时目录
+   - 使用 `fs-extra.remove()`
+
+4. **异常处理**：
+   - PDF 解析失败、图片提取失败、OCR 识别失败、空内容判断
+   - 统一抛出标准化错误信息
+
+### 返回格式
+
+```ts
+{
+  success: boolean;
+  data: { text: string };
+  error?: string;
+}
+```
+
+## 禁止行为
+
+1. 禁止省略临时文件清理逻辑
+2. 禁止将 OCR 逻辑写在路由层，必须在 Service 层
+3. 禁止破坏 Monorepo 包边界
+4. 禁止使用 npm/yarn，必须使用 pnpm
+5. 禁止将解析后文本做持久化存储
+
+## 测试要点
+
+- 纯原生文本 PDF 提取
+- 纯图片/扫描件 PDF OCR
+- 图文混排 PDF 合并结果
+- 临时文件自动清理验证
+- 损坏 PDF 异常处理

@@ -1,0 +1,256 @@
+---
+description: Database design, migration, and ORM usage for PostgreSQL/MySQL with TypeORM/Prisma.
+alwaysApply: false
+---
+
+# 数据库设计规范
+
+详细规范见：`docs/AI工程化开发手册/数据库设计规范（AI 工程化版）.md`
+
+## 命名规范
+
+### 表命名
+
+```text
+规则：模块_实体名
+示例：
+- user_accounts
+- order_items
+- product_categories
+```
+
+### 字段命名
+
+```text
+规则：snake_case
+示例：
+- user_name
+- created_at
+- updated_at
+- is_deleted
+```
+
+### 索引命名
+
+```text
+规则：idx_表名_字段名
+示例：
+- idx_users_email
+- idx_orders_user_id
+```
+
+## 必须字段
+
+所有表必须有：
+
+```sql
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+```
+
+## 主键设计
+
+```sql
+-- 方案1：UUID（推荐）
+id UUID PRIMARY KEY DEFAULT gen_random_uuid()
+
+-- 方案2：自增ID
+id BIGSERIAL PRIMARY KEY
+```
+
+## 字段类型
+
+| 业务场景 | PostgreSQL | MySQL |
+|---------|-----------|-------|
+| 短文本 | VARCHAR(255) | VARCHAR(255) |
+| 长文本 | TEXT | TEXT |
+| 整数 | INTEGER / BIGINT | INT / BIGINT |
+| 小数 | DECIMAL(10,2) | DECIMAL(10,2) |
+| 金额 | DECIMAL(10,2) | DECIMAL(10,2) |
+| 日期 | TIMESTAMP | DATETIME |
+| 布尔 | BOOLEAN | TINYINT(1) |
+| JSON | JSONB | JSON |
+
+## 索引规范
+
+### 必须加索引
+
+- WHERE 条件字段
+- ORDER BY 字段
+- JOIN 关联字段
+- 唯一约束字段
+
+### 索引设计
+
+```sql
+-- 单字段索引
+CREATE INDEX idx_users_email ON users(email);
+
+-- 联合索引（遵循最左前缀）
+CREATE INDEX idx_orders_user_status ON orders(user_id, status);
+
+-- 唯一索引
+CREATE UNIQUE INDEX idx_users_email ON users(email);
+```
+
+### 禁止
+
+- ❌ 索引过多（影响写入性能）
+- ❌ 在长文本字段建索引
+- ❌ 在区分度低的字段建索引
+
+## TypeORM Entity 规范
+
+```ts
+@Entity('users')
+export class User {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ length: 255 })
+  email: string;
+
+  @Column({ name: 'password_hash' })
+  passwordHash: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
+}
+```
+
+## Prisma Schema 规范
+
+```prisma
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+
+  @@index([email])
+}
+```
+
+## Repository 模式
+
+```ts
+// ✅ 正确
+@Injectable()
+export class UserRepository {
+  constructor(
+    @InjectRepository(User)
+    private readonly repo: Repository<User>,
+  ) {}
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.repo.findOne({ where: { email } });
+  }
+}
+```
+
+## 软删除
+
+```sql
+-- 逻辑删除
+ALTER TABLE users ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP NULL;
+```
+
+## 迁移文件命名
+
+```text
+src/database/migrations/
+├── 001-create-users.ts
+├── 002-add-user-status.ts
+└── 003-create-orders.ts
+```
+
+## AI 生成 SQL 禁止
+
+- ❌ 禁止字符串拼接 SQL（必须参数化）
+- ❌ 禁止在循环中查询数据库
+- ❌ 禁止 SELECT *
+- ❌ 禁止无 LIMIT 查询
+
+## SQL 检查
+
+```sql
+-- ❌ 危险
+SELECT * FROM users WHERE id = ${userId}
+
+-- ✅ 正确
+SELECT id, email, name FROM users WHERE id = $1
+```
+
+## 分页查询
+
+```sql
+-- ✅ 正确
+SELECT * FROM orders
+WHERE user_id = $1
+ORDER BY created_at DESC
+LIMIT 20 OFFSET 0;
+
+-- ❌ 禁止
+SELECT * FROM orders;  -- 全表扫描
+```
+
+## 常见模式
+
+### 乐观锁
+
+```sql
+ALTER TABLE orders ADD COLUMN version INTEGER DEFAULT 0;
+
+UPDATE orders
+SET status = 'completed', version = version + 1
+WHERE id = 'xxx' AND version = 1;
+```
+
+### 软删除 + 唯一索引
+
+```sql
+CREATE UNIQUE INDEX idx_users_email_active
+ON users(email)
+WHERE is_deleted = FALSE;
+```
+
+## 安全规范
+
+- ❌ 密码明文存储
+- ❌ 敏感信息日志记录
+- ❌ SQL 拼接
+- ❌ 数据库账号密码硬编码
+
+## AI 数据库设计 Prompt 模板
+
+```txt
+【任务】
+设计用户模块数据库
+
+【要求】
+1. 用户表（含审计字段）
+2. 角色表
+3. 权限表
+4. 用户角色关联表
+
+【约束】
+- 使用 PostgreSQL
+- 使用 UUID 主键
+- 支持软删除
+- 支持审计
+
+【输出】
+1. ER 图
+2. 建表 SQL
+3. 索引设计
+4. 迁移文件
+```

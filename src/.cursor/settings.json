@@ -1,0 +1,171 @@
+{
+  "plugins": {
+    "linear": {
+      "enabled": false
+    }
+  },
+  "cursorrules": {
+    "roles": {
+      "## === 开发角色 ===": "",
+      "Planner Agent": {
+        "rules": [".cursor/rules/planner.mdc"]
+      },
+      "Frontend Agent": {
+        "rules": [".cursor/rules/frontend.mdc"]
+      },
+      "Backend Agent": {
+        "rules": [".cursor/rules/backend.mdc"]
+      },
+      "Test Agent": {
+        "rules": [".cursor/rules/TEST.mdc"]
+      },
+      "Reviewer Agent": {
+        "rules": [".cursor/rules/reviewer.mdc"]
+      },
+      "Fix Agent": {
+        "rules": [".cursor/rules/fix.mdc"]
+      },
+
+      "## === 产品/管理角色 ===": "",
+      "PM Agent": {
+        "rules": [".cursor/rules/PM.mdc"]
+      },
+      "PMO Agent": {
+        "rules": [".cursor/rules/PMO.mdc"]
+      },
+      "Tech Lead Agent": {
+        "rules": [".cursor/rules/tech-lead.mdc"]
+      },
+
+      "## === Human Gate 角色 ===": "",
+      "PM Human Gate Agent": {
+        "rules": [".cursor/prompts/pm-human-gate.md"]
+      },
+      "PMO Human Gate Agent": {
+        "rules": [".cursor/prompts/pmo-human-gate-prompt.md"]
+      },
+      "Security Human Gate Agent": {
+        "rules": [".cursor/prompts/security-human-gate.md"]
+      },
+      "Tech Lead Human Gate Agent": {
+        "rules": [".cursor/prompts/tech-lead-human-gate.md"]
+      },
+      "Test Human Gate Agent": {
+        "rules": [".cursor/prompts/test-human-gate.md"]
+      },
+      "Reviewer Human Gate Agent": {
+        "rules": [".cursor/rules/review-gate.mdc"]
+      },
+
+      "## === 技术栈角色 ===": "",
+      "React Agent": {
+        "rules": [".cursor/rules/react.mdc"]
+      },
+      "Vue3 Agent": {
+        "rules": [".cursor/rules/frontend-vue3.mdc"]
+      },
+      "Next.js Agent": {
+        "rules": [".cursor/rules/fullstack-react-nextjs.mdc"]
+      },
+      "FastAPI Python Agent": {
+        "rules": [".cursor/rules/fastapi-python.mdc"]
+      },
+      "Flask Python Agent": {
+        "rules": [".cursor/rules/flask-python.mdc"]
+      },
+      "Go Agent": {
+        "rules": [".cursor/rules/go.mdc"]
+      },
+      "Java Agent": {
+        "rules": [".cursor/rules/java.mdc"]
+      },
+      "PHP Agent": {
+        "rules": [".cursor/rules/php.mdc"]
+      },
+      "Android Agent": {
+        "rules": [".cursor/rules/android.mdc"]
+      },
+      "Chrome Extension Agent": {
+        "rules": [".cursor/rules/chrome-extension.mdc"]
+      },
+      "DBA Agent": {
+        "rules": [".cursor/rules/DBA.mdc"]
+      },
+      "Fullstack Agent": {
+        "rules": [".cursor/rules/fullstack.mdc"]
+      },
+
+      "## === 专项角色 ===": "",
+      "UI Agent": {
+        "rules": [".cursor/rules/UI.mdc"]
+      },
+      "UX Agent": {
+        "rules": [".cursor/rules/UX.mdc"]
+      },
+      "Deploy Agent": {
+        "rules": [".cursor/rules/deploy-rules.mdc"]
+      },
+      "Security Agent": {
+        "rules": [".cursor/rules/security-rules.md"]
+      },
+      "Spec Coding Agent": {
+        "rules": [".cursor/rules/spec-coding.mdc"]
+      },
+      "Troubleshooting Agent": {
+        "rules": [".cursor/rules/troubleshoot-issues.mdc"]
+      }
+    },
+    "skills": {
+      "## === 开发技能 ===": "",
+      "agent-development": {
+        "rules": [".cursor/skills/agent-development/SKILL.md"]
+      },
+      "command-development": {
+        "rules": [".cursor/skills/command-development/SKILL.md"]
+      },
+      "hook-development": {
+        "rules": [".cursor/skills/hook-development/SKILL.md"]
+      },
+      "skill-development": {
+        "rules": [".cursor/skills/skill-development/SKILL.md"]
+      },
+      "frontend-design": {
+        "rules": [".cursor/skills/frontend-design/SKILL.md"]
+      },
+      "writing-rules": {
+        "rules": [".cursor/skills/writing-rules/SKILL.md"]
+      },
+
+      "## === Human Gate 技能 ===": "",
+      "pm-human-gate": {
+        "rules": [".cursor/prompts/pm-human-gate.md"]
+      },
+      "pmo-human-gate": {
+        "rules": [".cursor/prompts/pmo-human-gate-prompt.md"]
+      },
+      "security-human-gate": {
+        "rules": [".cursor/prompts/security-human-gate.md"]
+      },
+      "tech-lead-human-gate": {
+        "rules": [".cursor/prompts/tech-lead-human-gate.md"]
+      },
+      "test-human-gate": {
+        "rules": [".cursor/prompts/test-human-gate.md"]
+      },
+      "reviewer-human-gate": {
+        "rules": [".cursor/prompts/plan-step-human-gate.md"]
+      },
+
+      "## === 执行流程 ===": "",
+      "run-all": {
+        "rules": [".cursor/prompts/00-run-all.md"]
+      },
+      "run-step": {
+        "rules": [".cursor/prompts/run-step.md"]
+      },
+      "execute-plan": {
+        "rules": [".cursor/prompts/execute-plan.md"]
+      }
+    }
+  }
+}

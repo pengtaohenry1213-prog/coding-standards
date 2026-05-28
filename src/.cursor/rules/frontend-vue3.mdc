@@ -1,0 +1,40 @@
+---
+description: 前端开发规范（Vue3 + TypeScript + Vite），涵盖类型安全、代码结构、样式、性能指标等
+globs: packages/frontend/**/*.{ts,vue,tsx,js,jsx,vue}
+alwaysApply: false
+---
+
+# 前端（Vue3 + TypeScript）
+
+## 规范约定（引用）
+
+**详细规范文档**：`docs/AI工程化开发手册/前端工程化 SOP（Vue3 + TS + Vben Admin）.md`
+
+其他引用：
+- **风格与格式**：以项目内 ESLint / Prettier 配置为准。
+- **提交信息**：`docs/AI工程化开发手册/Git 规范（AI 工程化开发版）.md`
+- **安全规范**：`docs/AI工程化开发手册/安全工程规范（AI 工程化版）.md`
+
+## 技术栈（以 package.json 为唯一事实来源）
+
+默认 Vue 3 **Composition API** + TypeScript + Vite；状态与路由以项目已选依赖（如 Pinia、Vue Router）为准。
+
+## 必须遵守
+
+- **类型**：导出函数/Composable 的入参与返回值显式类型；禁止使用 `any`。
+- **安全**：无密钥、Token，内网地址等硬编码；环境变量按项目既有模式读取。
+- **结构**：按 `docs/AI工程化开发手册/前端工程化 SOP.md` 目录规范拆分（views、components、store、utils 等）；单文件过长则拆 Composable/子组件。
+- **样式**：优先 scoped 或 CSS Modules；避免污染全局。
+
+## 质量与性能
+
+- **测试覆盖率**：工具函数覆盖率 > 70%，关键流程用例 100% 覆盖。
+- **性能指标**：LCP 小于 2.5s、CLS 小于 0.1、首屏加载时间小于 1500ms。
+
+## 禁止
+
+- Vue 2 Options API（除非维护遗留且任务明确仅限旧代码）。
+- 为赶进度去掉错误处理、空值分支或安全默认值。
+- 使用 `any` 类型。
+- `console.log` 用于生产代码。
+- 组件超过 300 行不拆分。

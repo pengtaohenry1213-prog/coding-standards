@@ -1,0 +1,149 @@
+# PM vs PMO
+
+
+## Role 职责划分：PM vs PMO（核心结论）
+
+先明确 **PM（产品经理）** 和 **PMO（项目管理办公室）** 在“输出物&验收标准+决策闭环”中的核心分工，避免职责重叠：
+
+| 角色 | 核心职责（决策闭环） | 对应文件载体 |
+| --- | --- | --- |
+| PM | 1. 制定具体的验收标准（功能/体验/交付维度） 2. 基于验收标准对输出物做「通过/驳回/条件通过」的一线决策 3. 记录决策依据（如驳回原因、条件通过的具体要求） | `PM.mdc`（聚焦单产品/单需求的验收决策） |
+| PMO | 1. 制定组织级的验收流程规范（统一决策闭环的规则） 2. 监督PM的决策是否符合流程（如决策是否有依据、条件通过是否落地） 3. 对重大决策（如跨项目风险、合规问题）进行复核 4. 确保决策闭环的完整性（无“悬置决策”） | `PMO.mdc`（聚焦流程合规、决策监督） |
+
+简单来说：**PM 做“具体验收决策”，PMO 做“决策流程的合规性管控”**，两者配合形成完整的 Role 检查+决策闭环。
+
+## Role 落地：.mdc 文件编写规范（参考现有规则格式）
+
+参考代码库中 `hookify-rules.md` 的规则模板（`---` 元信息 + 规则描述 + 验收/决策要求），以下是 `PM.mdc` 和 `PMO.mdc` 的具体示例：
+
+### 1. PM.mdc（一线验收决策规则）
+
+见 `rules/PM.mdc` 文件。
+
+### 2. PMO.mdc（决策流程监督规则）
+
+见 `rules/PMO.mdc` 文件。
+
+---
+
+根据你现有的文件结构，给你一些 **Human Gate 设计建议**：
+
+---
+
+## 当前已有的 Human Gate 文件
+
+| 文件 | 定位 |
+|------|------|
+| `human-gate.md` | 通用概念说明 |
+| `plan-step-human-gate.md` | PM+PMO+Security 双 Gate 流程 |
+| `pmo-human-gate-prompt.md` | PMO 审批人角色 prompt |
+
+---
+
+## 建议新增的 Human Gate 角色
+
+### 1. **PM Human Gate** (`pm-human-gate.md`)
+
+```
+触发时机：Plan/PRD 提交评审时
+Gate 检查项：
+- [ ] 需求完整性（背景、范围、不做清单）
+- [ ] 可验收标准明确
+- [ ] P0-P3 优先级合理
+- [ ] 边界/异常场景覆盖
+→ 输出：APPROVED / REJECTED / CONDITIONAL
+```
+
+### 2. **Security Human Gate** (`security-human-gate.md`)
+
+```
+触发时机：所有文件/命令/Agent 操作前
+Gate 检查项（引用 security-rules.md）：
+- [ ] 无路径穿越
+- [ ] 无危险命令 (rm -rf, chmod 777, etc.)
+- [ ] 无硬编码密钥
+- [ ] 敏感数据已脱敏
+→ 输出：SAFE / WARN / BLOCK
+```
+
+### 3. **Test Human Gate** (`test-human-gate.md`)
+
+```
+触发时机：测试报告提交时
+Gate 检查项：
+- [ ] 核心用例 100% 覆盖
+- [ ] 缺陷分级明确 (P0-P3)
+- [ ] 缺陷可复现、有证据
+- [ ] 通过率符合发布标准
+→ 输出：PASSED / FAILED / CONDITIONAL
+```
+
+### 4. **Tech Lead Human Gate** (`tech-lead-human-gate.md`)
+
+```
+触发时机：代码设计/架构变更时
+Gate 检查项：
+- [ ] 技术方案可行
+- [ ] 符合编码规范
+- [ ] 有回滚方案
+- [ ] 性能/安全考虑周全
+→ 输出：APPROVED / REJECTED
+```
+
+---
+
+## 建议的 Gate 流程
+
+```
+需求提出 → PM Gate → PMO Gate → Security Gate
+    ↓          ↓          ↓          ↓
+  Plan       Plan       风险       安全
+  评审       评审       评审       扫描
+    ↓          ↓          ↓          ↓
+  通过      通过       通过       通过
+    ↓          ↓          ↓          ↓
+  执行 Step（各角色 Human Gate 按需触发）
+    ↓
+  产出评审（Test Gate / PM Gate）
+```
+
+---
+
+现在 `settings.json` 追加 4 个 Human Gate skills 配置：
+
+```json
+"pm-human-gate": {
+  "rules": [".cursor/prompts/pm-human-gate.md"]
+},
+"security-human-gate": {
+  "rules": [".cursor/prompts/security-human-gate.md"]
+},
+"test-human-gate": {
+  "rules": [".cursor/prompts/test-human-gate.md"]
+},
+"tech-lead-human-gate": {
+  "rules": [".cursor/prompts/tech-lead-human-gate.md"]
+}
+```
+
+## 当前 Human Gate 体系
+
+```
+需求提出
+    ↓
+PM Human Gate（需求评审）
+    ↓
+PMO Human Gate（风险管控）
+    ↓
+Security Human Gate（安全扫描）
+    ↓
+Tech Lead Human Gate（技术评审）
+    ↓
+执行 Step
+    ↓
+Test Human Gate（测试验收）
+    ↓
+发布
+```
+
+这些文件在移动到 `.cursor` 目录后即可生效。

@@ -1,0 +1,50 @@
+# Planner Agent
+
+## 定位
+
+读取 step 文档，拆解为可执行的 Plan。
+
+## 职责
+
+1. 读取 `doc/steps/stepN.md`
+2. 生成 `.cursor/plans/stepN-plan.md`
+3. 拆解为原子 todos
+4. 标注类型（frontend / backend / test / fix）
+5. 明确依赖关系和验收标准
+
+## Plan 必须包含
+
+```yaml
+todos:
+  - id: todo-1
+    type: frontend | backend | test | fix
+    content: 描述
+    depends_on: []
+    acceptance: 验收标准
+  - id: todo-2
+    type: ...
+    depends_on: [todo-1]
+    ...
+
+files:
+  - path/to/file
+
+acceptance:
+  - 验收标准1
+  - 验收标准2
+```
+
+## 规则
+
+- 每个 todo 必须标明 type
+- 粒度必须细（一个 todo = 一个动作）
+- 前后端必须分离
+- 测试必须独立
+- 必须有 topological 排序，确保依赖正确
+
+## 执行完成后
+
+```bash
+git add .
+git commit -m "plan(stepN): 生成 Plan"
+```
