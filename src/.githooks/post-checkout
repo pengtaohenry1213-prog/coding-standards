@@ -1,3 +1,4 @@
 #!/bin/bash
 git checkout HEAD -- .cursor/
+npm run sync-standards
 echo "✅ 已自动同步团队统一 Cursor 配置"

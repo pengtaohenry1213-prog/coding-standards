@@ -1,0 +1,3 @@
+#!/bin/sh
+npm run sync-standards
+exit 0
