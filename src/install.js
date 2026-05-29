@@ -2,12 +2,36 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// 项目根目录
-const projectRoot = process.cwd();
+/**
+ * 可靠获取业务项目根目录
+ * 解决npm执行postinstall时cwd不正确的问题
+ */
+function getProjectRoot() {
+  let currentDir = __dirname;
+  // 往上找，直到找到package.json且不是我们自己的包
+  while (currentDir !== path.parse(currentDir).root) {
+    const packageJsonPath = path.join(currentDir, 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      try {
+        const pkg = require(packageJsonPath);
+        if (pkg.name !== '@pengtaohenry1213-prog/coding-standards') {
+          return currentDir;
+        }
+      } catch (e) {}
+    }
+    currentDir = path.dirname(currentDir);
+  }
+  // 兜底：使用当前工作目录
+  return process.cwd();
+}
+
+// 项目根目录（现在永远正确）
+const projectRoot = getProjectRoot();
 // 包内的规范文件目录
 const packageRoot = __dirname;
-// 缓存文件路径（存放在node_modules内部，不会被提交）
-const cachePath = path.join(projectRoot, 'node_modules', '.standards-cache.json');
+// 缓存文件路径（存放在业务项目的node_modules根目录）
+const cacheDir = path.join(projectRoot, 'node_modules');
+const cachePath = path.join(cacheDir, '.standards-cache.json');
 
 // 读取当前包的版本号
 const packageJson = require(path.join(packageRoot, '../package.json'));
@@ -41,6 +65,11 @@ function needSync() {
  */
 function syncStandards() {
   console.log(`📦 正在同步规范版本 v${currentVersion}...\n`);
+
+  // 确保缓存目录存在
+  if (!fs.existsSync(cacheDir)) {
+    fs.mkdirSync(cacheDir, { recursive: true });
+  }
 
   // 1. 同步.cursor目录
   const cursorSrc = path.join(packageRoot, '.cursor');

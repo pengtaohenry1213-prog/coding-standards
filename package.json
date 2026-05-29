@@ -3,9 +3,6 @@
   "version": "1.0.6",
   "description": "团队统一编码规范与AI辅助配置",
   "main": "src/index.js",
-  "scripts": {
-    "postinstall": "node src/install.js"
-  },
   "files": [
     "src/**/*"
   ],
