@@ -1,5 +1,5 @@
 #!/bin/sh
-npm run sync-standards
+node -e "require('@pengtaohenry1213-prog/coding-standards/src/install.js').autoSync()"
 
 # 拉代码后自动同步规范
 if [ -f "package.json" ]; then

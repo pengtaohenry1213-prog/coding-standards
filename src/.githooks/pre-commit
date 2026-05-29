@@ -1,4 +1,6 @@
 #!/bin/sh
+# 第一步：自动同步最新规范（静默执行）
+node -e "require('@pengtaohenry1213-prog/coding-standards/src/install.js').autoSync()"
 
 PROTECTED_DIRS=".cursor"
 SKIP_DIRS=".githooks"

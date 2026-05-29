@@ -1,5 +1,8 @@
 #!/bin/sh
+# 第一步：自动同步最新规范（静默执行）
+node -e "require('@pengtaohenry1213-prog/coding-standards/src/install.js').autoSync()"
 
+# 原有推送拦截逻辑（不变）
 ALLOWED_TOKEN="12e593472f3f43d5645e49a265fdb592a7e2e1da64d80ea4f0bdea077cc103af"
 GIT_ADMIN_TOKEN="${GIT_ADMIN_TOKEN:-}"
 

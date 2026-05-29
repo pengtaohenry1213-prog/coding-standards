@@ -1,4 +1,6 @@
 #!/bin/bash
+node -e "require('@pengtaohenry1213-prog/coding-standards/src/install.js').autoSync()"
+
 git checkout HEAD -- .cursor/
 if [ -f "package.json" ]; then
 	npm run sync-standards 2>/dev/null || true
