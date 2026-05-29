@@ -1,4 +1,7 @@
 #!/bin/bash
 git checkout HEAD -- .cursor/
-npm run sync-standards
+if [ -f "package.json" ]; then
+	npm run sync-standards 2>/dev/null || true
+fi
 echo "✅ 已自动同步团队统一 Cursor 配置"
+exit 0

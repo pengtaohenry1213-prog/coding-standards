@@ -15,5 +15,8 @@
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
-  }
+  },
+  "keywords": ["coding-standards", "cursor", "git-hooks"],
+  "author": "pengtaohenry1213-prog",
+  "license": "ISC"
 }

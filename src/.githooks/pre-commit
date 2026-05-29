@@ -52,3 +52,4 @@ if [ -n "$BLOCKED_FILES" ]; then
 fi
 
 echo "✅ protected 规则检查通过"
+exit 0

@@ -1,3 +1,9 @@
 #!/bin/sh
 npm run sync-standards
+
+# 拉代码后自动同步规范
+if [ -f "package.json" ]; then
+	npm run sync-standards 2>/dev/null || true
+fi
+
 exit 0

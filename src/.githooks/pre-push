@@ -1,0 +1,23 @@
+#!/bin/sh
+
+ALLOWED_TOKEN="12e593472f3f43d5645e49a265fdb592a7e2e1da64d80ea4f0bdea077cc103af"
+GIT_ADMIN_TOKEN="${GIT_ADMIN_TOKEN:-}"
+
+# 管理员允许push到main
+if [ "$GIT_ADMIN_TOKEN" = "$ALLOWED_TOKEN" ]; then
+    echo "🔑 管理员模式：允许 push 到 main"
+    exit 0
+fi
+
+# 普通用户禁止push到main
+while read local_ref local_sha remote_ref remote_sha; do
+    if [[ "$remote_ref" == "refs/heads/main" ]]; then
+        echo "====================================================="
+        echo "❌ 禁止直接 push 到 main 分支！"
+        echo "✅ 正确流程：新建分支 → PR → 审核 → 合并"
+        echo "====================================================="
+        exit 1
+    fi
+done
+
+exit 0
